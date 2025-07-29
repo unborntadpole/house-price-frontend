@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flat Price Predictor</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+    }
+    label {
+      font-weight: bold;
+    }
+    select, input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Predict Flat Price</h1>
+
+  <form id="predictForm">
+    <label for="flat_type">Flat Type</label>
+    <select id="flat_type"></select>
+
+    <label for="location1">Location</label>
+    <select id="location1"></select>
+
+    <label for="age_of_property">Age of Property</label>
+    <select id="age_of_property"></select>
+
+    <label for="furnishing">Furnishing</label>
+    <select id="furnishing"></select>
+
+    <label for="parking">Parking</label>
+    <select id="parking"></select>
+
+    <label for="buildupArea_sqft">Built-up Area (sqft)</label>
+    <input type="number" id="buildupArea_sqft" required>
+
+    <label for="bedrooms">Bedrooms</label>
+    <input type="number" id="bedrooms" required>
+
+    <label for="bathrooms">Bathrooms</label>
+    <input type="number" id="bathrooms" required>
+
+    <label for="balcony">Balcony</label>
+    <input type="number" id="balcony" required>
+
+    <button type="submit">Predict Price</button>
+  </form>
+
+  <h2 id="result"></h2>
+
+  <script>
+    const options = {
+      flat_type: ['1 BHK Flat', '2 BHK Flat', '3 BHK Flat', '4 BHK Flat', '5 BHK Flat', '6 BHK Flat'],
+      location1: ['Agripada', 'Andheri East', 'Andheri West', 'Bandra East', 'Bandra West', 'Bhandup East', 'Bhandup West', 'Bhayandar East', 'Bhayandar West', 'Boisar', 'Borivali East', 'Borivali West', 'Byculla', 'Chembur', 'Churchgate', 'Colaba', 'Cuffe Parade', 'Cumballa Hill', 'Dadar East', 'Dadar West', 'Dahisar East', 'Dahisar West', 'Ghatkopar East', 'Ghatkopar West', 'Girgaon', 'Goregaon East', 'Goregaon West', 'Govandi', 'Jogeshwari East', 'Jogeshwari West', 'Kamathipura', 'Kandivali East', 'Kandivali West', 'Kanjurmarg East', 'Kanjurmarg West', 'Khar West', 'Kurla East', 'Kurla West', 'Lower Parel', 'Madanpura', 'Madh', 'Mahalakshmi', 'Mahim', 'Malabar Hill', 'Malad East', 'Malad West', 'Marine Lines', 'Matunga East', 'Matunga West', 'Mazgaon', 'Mira Road East', 'Mulund East', 'Mulund West', 'Mumbai Central', 'Naigaon East', 'Nalasopara East', 'Nalasopara West', 'Palghar', 'Parel', 'Powai', 'Prabhadevi', 'Sakinaka', 'Santacruz East', 'Santacruz West', 'Sewri', 'Sion', 'Tardeo', 'Thane West', 'Vasai East', 'Vasai West', 'Vikhroli East', 'Vikhroli West', 'Vile Parle East', 'Vile Parle West', 'Virar East', 'Virar West', 'Wadala', 'Wadala East', 'Worli', 'others'],
+      age_of_property: ['mid age property', 'modern property', 'new construction', 'old propert', 'recent construction'],
+      furnishing: ['Fully Furnished', 'Semi Furnished', 'Unfurnished'],
+      parking: ['no', 'yes']
+    };
+
+    // Populate dropdowns
+    for (let field in options) {
+      const select = document.getElementById(field);
+      options[field].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+    }
+
+    document.getElementById("predictForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        flat_type: document.getElementById("flat_type").value,
+        location1: document.getElementById("location1").value,
+        age_of_property: document.getElementById("age_of_property").value,
+        furnishing: document.getElementById("furnishing").value,
+        parking: document.getElementById("parking").value,
+        buildupArea_sqft: parseFloat(document.getElementById("buildupArea_sqft").value),
+        bedrooms: parseInt(document.getElementById("bedrooms").value),
+        bathrooms: parseInt(document.getElementById("bathrooms").value),
+        balcony: parseInt(document.getElementById("balcony").value)
+      };
+
+      const response = await fetch("http://127.0.0.1:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      document.getElementById("result").textContent =
+        `Predicted Flat Price: ₹${result.predicted_price_lakhs} crores`;
+    });
+  </script>
+
+</body>
+</html>
